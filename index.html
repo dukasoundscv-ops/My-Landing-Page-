@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindfulApp – Meditation Anywhere</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      text-align: center;
+      scroll-behavior: smooth;
+    }
+
+    header {
+      padding: 80px 20px;
+    }
+
+    header h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+
+    header p {
+      font-size: 22px; /* Increased from 18px to 22px */
+      margin-bottom: 40px;
+      line-height: 1.4;
+    }
+
+    /* Buttons bigger on desktop */
+    .btn {
+      padding: 20px 40px;
+      margin: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary { background: #ffcc00; color: #000; }
+    .btn-primary:hover { background: #ffdb4d; transform: translateY(-2px); }
+    .btn-secondary { background: #fff; color: #000; }
+    .btn-secondary:hover { background: #eee; transform: translateY(-2px); }
+    .btn-danger { background: #ff0000; color: #fff; }
+    .btn-danger:hover { background: #e60000; transform: translateY(-2px); }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+    }
+
+    .lightbox-content {
+      position: relative;
+      width: 90%;
+      max-width: 1200px; /* bigger max width */
+      margin: 5% auto;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      padding-top: 56.25%; /* 16:9 ratio */
+      height: 0;
+    }
+
+    .lightbox-content iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: white;
+      color: black;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      text-align: center;
+      z-index: 1100;
+    }
+
+    /* Waitlist form */
+    #waitlistForm {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #waitlistForm.show {
+      display: block;
+      opacity: 1;
+    }
+
+    form {
+      margin: 30px auto;
+      max-width: 400px;
+      text-align: left;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    form input, form select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      header h1 { font-size: 32px; } /* Slightly increased mobile heading */
+      header p {
+        font-size: 20px; /* Increased from 16px to 20px for mobile */
+        margin-bottom: 30px;
+      }
+     
+      /* Stack buttons vertically - enhanced */
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+      }
+     
+      header .btn {
+        display: block;
+        width: 80%;
+        margin: 0 auto;
+        padding: 18px 30px;
+      }
+
+      form { width: 90%; }
+
+      /* Lightbox almost full width on mobile */
+      .lightbox-content {
+        width: 95%;
+        padding-top: 56.25%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header { padding: 60px 15px; }
+      header h1 { font-size: 28px; }
+      header p { font-size: 18px; }
+     
+      header .btn {
+        width: 90%;
+        font-size: 18px;
+        padding: 16px 20px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Welcome to MindfulApp</h1>
+    <p>Discover inner peace with guided meditations – anytime, anywhere.</p>
+
+    <!-- Buttons Container for better mobile stacking -->
+    <div class="btn-container">
+      <button class="btn btn-danger" id="watchTrailer">▶ Watch Trailer</button>
+      <button class="btn btn-primary" id="joinWaitlistBtn">Join Waitlist</button>
+      <button class="btn btn-secondary" id="buyNowBtn">Buy Now</button>
+    </div>
+  </header>
+
+  <!-- Waitlist Form -->
+  <section id="waitlistForm">
+    <form action="https://formspree.io/f/yourFormID" method="POST">
+      <label for="email">Email Address</label>
+      <input type="email" name="email" id="email" placeholder="Enter your email" required>
+
+      <label for="country">Country</label>
+      <select id="country" name="country" required>
+        <option value="">Select your country</option>
+        <option>USA</option>
+        <option>UK</option>
+        <option>Canada</option>
+        <option>Other</option>
+      </select>
+
+      <!-- This appears if "Other" is chosen -->
+      <div id="otherCountryField" style="display:none;">
+        <label for="otherCountry">Please specify</label>
+        <input type="text" id="otherCountry" name="otherCountry" placeholder="Enter your country">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </section>
+
+  <!-- Lightbox for YouTube -->
+  <div class="lightbox" id="trailerLightbox">
+    <div class="lightbox-content">
+      <span class="close" id="closeBtn" aria-label="Close video">&times;</span>
+      <iframe id="youtubePlayer" src=""
+        allow="autoplay; encrypted-media"
+        allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    // Lightbox controls
+    const watchBtn = document.getElementById("watchTrailer");
+    const lightbox = document.getElementById("trailerLightbox");
+    const closeBtn = document.getElementById("closeBtn");
+    const player = document.getElementById("youtubePlayer");
+
+    const YT_ID = "ScMzIvxBSi4"; // sample video
+
+    watchBtn.onclick = () => {
+      player.src = `https://www.youtube.com/embed/${YT_ID}?autoplay=1&mute=1`;
+      lightbox.style.display = "block";
+    };
+
+    closeBtn.onclick = () => {
+      player.src = "";
+      lightbox.style.display = "none";
+    };
+
+    window.onclick = (e) => {
+      if (e.target === lightbox) {
+        player.src = "";
+        lightbox.style.display = "none";
+      }
+    };
+
+    // Country field toggle
+    const countrySelect = document.getElementById("country");
+    const otherField = document.getElementById("otherCountryField");
+
+    countrySelect.addEventListener("change", function() {
+      otherField.style.display = this.value === "Other" ? "block" : "none";
+    });
+
+    // Join Waitlist toggle
+    const joinBtn = document.getElementById("joinWaitlistBtn");
+    const formSection = document.getElementById("waitlistForm");
+
+    joinBtn.onclick = () => {
+      formSection.classList.toggle("show");
+      if (formSection.classList.contains("show")) {
+        formSection.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    // Buy Now button
+    const buyNowBtn = document.getElementById("buyNowBtn");
+    buyNowBtn.onclick = () => {
+      window.location.href = "https://www.paypal.com/checkout"; // replace with real checkout link
+    };
+  </script>
+
+</body>
+</html>
+```
